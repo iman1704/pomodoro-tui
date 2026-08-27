@@ -4,8 +4,8 @@ version = "0.2.0"
 edition = "2021"
 license = "MIT"
 description = "A simple Pomodoro timer with a terminal user interface."
-homepage = "https://github.com/xamcost/pomodoro"
-repository = "https://github.com/xamcost/pomodoro"
+homepage = "https://github.com/iman1704/pomodoro-tui"
+repository = "https://github.com/iman1704/pomodoro-tui"
 
 [dependencies]
 clap = { version = "4.5.37", features = ["derive"] }
