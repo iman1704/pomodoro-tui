@@ -4,6 +4,17 @@ use std::path::PathBuf;
 mod app;
 mod ascii_images;
 
+fn parse_session_name(s: &str) -> Result<String, String> {
+    let len = s.chars().count();
+    if len > 25 {
+        Err(format!(
+            "session name must be at most 25 characters (got {len})"
+        ))
+    } else {
+        Ok(s.to_string())
+    }
+}
+
 #[derive(Parser)]
 #[clap(about = "A simple Pomodoro timer")]
 #[clap(long_about = None)]
@@ -18,11 +29,18 @@ struct Args {
     sound: Option<String>,
     #[arg(
         short = 'n',
-        long = "no-sound",
-        help = "default to false",
+        long = "name",
+        value_parser = parse_session_name,
+        help = "Session name (max 25 characters)"
+    )]
+    name: Option<String>,
+    #[arg(
+        short = 'q',
+        long = "quiet",
+        help = "Suppress sound/notifications",
         default_value = "false"
     )]
-    no_sound: bool,
+    quiet: bool,
 }
 
 fn main() -> io::Result<()> {
@@ -41,7 +59,8 @@ fn main() -> io::Result<()> {
         args.break_time,
         args.hide_image,
         &sound,
-        args.no_sound,
+        args.quiet,
+        args.name,
     );
 
     app.handle_inputs();

@@ -9,7 +9,7 @@
   - new `-session` flag
 - [ ] Remove voice notification feature, keep only sound.
 - [ ] Custom ascii art
-- [ ] Session name
+- [x] Session name
   - new `-n --name` flag
   - change existing `-n --no-sound` flag to `-q --quiet`
   - session name is at the bottom of the timer
