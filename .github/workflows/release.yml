@@ -1,0 +1,28 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: Run tests
+        run: cargo test --all
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          # No binary artifacts needed for source-build Homebrew formula.
+          # GitHub auto-generates the source tarball at:
+          # https://github.com/iman1704/pomodoro-tui/archive/refs/tags/${{ github.ref_name }}.tar.gz
