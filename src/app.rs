@@ -1,8 +1,8 @@
 use crate::ascii_images;
+use crate::notify;
 use crossterm::event;
 use ratatui::{layout, style::Stylize, symbols, text, widgets, DefaultTerminal, Frame};
 use std::io;
-use std::path::Path;
 use std::sync::mpsc;
 use std::time;
 enum Event {
@@ -24,18 +24,11 @@ impl App {
         work_min: u64,
         break_min: u64,
         hide_image: bool,
-        sound: &Path,
-        no_sound: bool,
         session_name: Option<String>,
     ) -> Self {
         let (tx, rx) = mpsc::channel();
         App {
-            pomo: pomodoro_tui::Pomodoro::new(
-                (work_min, 0),
-                (break_min, 0),
-                sound.to_path_buf(),
-                no_sound,
-            ),
+            pomo: pomodoro_tui::Pomodoro::new((work_min, 0), (break_min, 0)),
             exit: false,
             tx,
             rx,
@@ -49,7 +42,19 @@ impl App {
             terminal.draw(|frame| self.draw(frame))?;
             match self.rx.recv() {
                 Ok(Event::Key(key_event)) => self.handle_key_event(key_event),
-                Ok(Event::Tick) => self.pomo.check_and_switch(),
+                Ok(Event::Tick) => {
+                    if let Some(new_state) = self.pomo.check_and_switch() {
+                        let (title, body) = match new_state {
+                            pomodoro_tui::PomodoroState::Work => {
+                                ("Pomodoro — Work", "Break over — back to work!")
+                            }
+                            pomodoro_tui::PomodoroState::Break => {
+                                ("Pomodoro — Break", "Work done — time for a break!")
+                            }
+                        };
+                        notify::notify(title, body);
+                    }
+                }
                 _ => (),
             }
         }

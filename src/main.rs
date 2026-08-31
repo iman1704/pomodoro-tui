@@ -1,8 +1,8 @@
 use clap::Parser;
 use std::io;
-use std::path::PathBuf;
 mod app;
 mod ascii_images;
+mod notify;
 
 fn parse_session_name(s: &str) -> Result<String, String> {
     let len = s.chars().count();
@@ -25,8 +25,6 @@ struct Args {
     break_time: u64,
     #[arg(short = 'i', long = "hide-image", default_value = "false")]
     hide_image: bool,
-    #[arg(short = 's', long = "sound")]
-    sound: Option<String>,
     #[arg(
         short = 'n',
         long = "name",
@@ -34,22 +32,10 @@ struct Args {
         help = "Session name (max 25 characters)"
     )]
     name: Option<String>,
-    #[arg(
-        short = 'q',
-        long = "quiet",
-        help = "Suppress sound/notifications",
-        default_value = "false"
-    )]
-    quiet: bool,
 }
 
 fn main() -> io::Result<()> {
     let args = Args::parse();
-
-    let sound = match &args.sound {
-        Some(sound) => PathBuf::from(sound.to_owned()),
-        None => PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("default_sound.mp3"),
-    };
 
     let terminal = ratatui::init();
 
@@ -58,8 +44,6 @@ fn main() -> io::Result<()> {
         args.work,
         args.break_time,
         args.hide_image,
-        &sound,
-        args.quiet,
         args.name,
     );
 
